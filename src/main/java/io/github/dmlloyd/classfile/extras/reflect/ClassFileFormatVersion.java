@@ -360,7 +360,7 @@ public enum ClassFileFormatVersion {
      * and has no other elements set.
      *
      * Class file format versions greater than or equal to {@link
-     * RELEASE_6} have non-{@code null} results.
+     * #RELEASE_6} have non-{@code null} results.
      */
     public Runtime.Version runtimeVersion() {
         // Starting with Java SE 6, the leading digit was the primary
