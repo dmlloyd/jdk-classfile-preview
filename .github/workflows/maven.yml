@@ -1,0 +1,42 @@
+name: CI
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+      - '**.adoc'
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+jobs:
+  build:
+    name: "Build and test"
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Install OpenJDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Clone project
+        uses: actions/checkout@v3
+        with:
+          path: jdk-classfile-preview
+
+      - name: Build
+        run: |
+          mvn --batch-mode verify
+        working-directory: jdk-classfile-preview
+
+      - name: Prepare failure archive (if maven failed)
+        if: failure()
+        shell: bash
+        run: find . -type d -name '*-reports' -o -name "*-logs" | tar -czf test-reports.tgz -T -
+
+      - name: Upload failure Archive (if maven failed)
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: test-reports
+          path: |
+            'test-reports.tgz'
