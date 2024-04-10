@@ -163,31 +163,41 @@
  * <p>
  * For nonstandard attributes, user-provided attribute mappers can be specified
  * through the use of the {@link
- * io.github.dmlloyd.classfile.Classfile.AttributeMapperOption#of(java.util.function.Function)}}
+ * io.github.dmlloyd.classfile.ClassFile.AttributeMapperOption#of(java.util.function.Function)}}
  * classfile option.  Implementations of custom attributes should extend {@link
  * io.github.dmlloyd.classfile.CustomAttribute}.
  *
  * <h3>Options</h3>
  * <p>
- * {@link io.github.dmlloyd.classfile.Classfile#of(Classfile.Option[])}
- * accepts a list of options.  {@link io.github.dmlloyd.classfile.Classfile.Option} is a base interface
+ * {@link io.github.dmlloyd.classfile.ClassFile#of(ClassFile.Option[])}
+ * accepts a list of options.  {@link io.github.dmlloyd.classfile.ClassFile.Option} is a base interface
  * for some statically enumerated options, as well as factories for more complex options,
  * including:
  * <ul>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.StackMapsOption}
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.StackMapsOption}
  * -- generate stackmaps (default is {@code STACK_MAPS_WHEN_REQUIRED})</li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.DebugElementsOption}
- * -- processing of debug information, such as local variable metadata (default is {@code PASS_DEBUG}) </li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.LineNumbersOption}
- * -- processing of line numbers (default is {@code PASS_LINE_NUMBERS}) </li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.UnknownAttributesOption}
- * -- processing of unrecognized attributes (default is {@code PASS_UNKNOWN_ATTRIBUTES})</li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.ConstantPoolSharingOption}}
- * -- share constant pool when transforming (default is {@code SHARED_POOL})</li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.ClassHierarchyResolverOption#of(ClassHierarchyResolver)}
- * -- specify a custom class hierarchy resolver used by stack map generation</li>
- *   <li>{@link io.github.dmlloyd.classfile.Classfile.AttributeMapperOption#of(java.util.function.Function)}
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.AttributeMapperOption#of(java.util.function.Function)}
  * -- specify format of custom attributes</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.UnknownAttributesOption}
+ * -- processing of unrecognized attributes (default is {@code PASS_UNKNOWN_ATTRIBUTES})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.ConstantPoolSharingOption}}
+ * -- share constant pool when transforming (default is {@code SHARED_POOL})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.ClassHierarchyResolverOption#of(ClassHierarchyResolver)}
+ * -- specify a custom class hierarchy resolver used by stack map generation</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.ConstantPoolSharingOption}}
+ * -- share constant pool when transforming (default is {@code SHARED_POOL})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.DeadCodeOption}}
+ * -- patch out unreachable code (default is {@code PATCH_DEAD_CODE})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.DeadLabelsOption}}
+ * -- filter unresolved labels (default is {@code FAIL_ON_DEAD_LABELS})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.DebugElementsOption}
+ * -- processing of debug information, such as local variable metadata (default is {@code PASS_DEBUG}) </li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.LineNumbersOption}
+ * -- processing of line numbers (default is {@code PASS_LINE_NUMBERS}) </li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.ShortJumpsOption}
+ * -- automatically rewrite short jumps to long when necessary (default is {@code FIX_SHORT_JUMPS})</li>
+ *   <li>{@link io.github.dmlloyd.classfile.ClassFile.StackMapsOption}
+ * -- generate stackmaps (default is {@code STACK_MAPS_WHEN_REQUIRED})</li>
  * </ul>
  * <p>
  * Most options allow you to request that certain parts of the classfile be
@@ -225,7 +235,7 @@
  * io.github.dmlloyd.classfile.CodeBuilder#invokeInstruction(Opcode,
  * java.lang.constant.ClassDesc, String, java.lang.constant.MethodTypeDesc,
  * boolean) CodeBuilder.invokeInstruction}, or {@link
- * io.github.dmlloyd.classfile.CodeBuilder#with(ClassfileElement)
+ * io.github.dmlloyd.classfile.CodeBuilder#with(ClassFileElement)
  * CodeBuilder.with}.
  * <p>
  * The convenience method {@code CodeBuilder.invokevirtual} behaves as if it calls
