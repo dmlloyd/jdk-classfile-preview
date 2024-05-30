@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -26,32 +26,40 @@ package io.github.dmlloyd.classfile.impl;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.extras.reflect.AccessFlag;
 import io.github.dmlloyd.classfile.AccessFlags;
 import io.github.dmlloyd.classfile.Attribute;
-import io.github.dmlloyd.classfile.AttributeMapper;
 import io.github.dmlloyd.classfile.Attributes;
 import io.github.dmlloyd.classfile.ClassElement;
 import io.github.dmlloyd.classfile.ClassModel;
-import io.github.dmlloyd.classfile.ClassReader;
 import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.ClassFileVersion;
+import io.github.dmlloyd.classfile.CustomAttribute;
 import io.github.dmlloyd.classfile.constantpool.ConstantPool;
 import io.github.dmlloyd.classfile.FieldModel;
 import io.github.dmlloyd.classfile.Interfaces;
 import io.github.dmlloyd.classfile.MethodModel;
 import io.github.dmlloyd.classfile.Superclass;
+import io.github.dmlloyd.classfile.attribute.InnerClassesAttribute;
+import io.github.dmlloyd.classfile.attribute.ModuleAttribute;
+import io.github.dmlloyd.classfile.attribute.ModuleHashesAttribute;
+import io.github.dmlloyd.classfile.attribute.ModuleMainClassAttribute;
+import io.github.dmlloyd.classfile.attribute.ModulePackagesAttribute;
+import io.github.dmlloyd.classfile.attribute.ModuleResolutionAttribute;
+import io.github.dmlloyd.classfile.attribute.ModuleTargetAttribute;
+import io.github.dmlloyd.classfile.attribute.RuntimeInvisibleAnnotationsAttribute;
+import io.github.dmlloyd.classfile.attribute.RuntimeVisibleAnnotationsAttribute;
+import io.github.dmlloyd.classfile.attribute.SourceDebugExtensionAttribute;
+import io.github.dmlloyd.classfile.attribute.SourceFileAttribute;
 
 public final class ClassImpl
         extends AbstractElement
         implements ClassModel {
 
-    final ClassReader reader;
+    final ClassReaderImpl reader;
     private final int attributesPos;
     private final List<MethodModel> methods;
     private final List<FieldModel> fields;
@@ -60,7 +68,6 @@ public final class ClassImpl
 
     public ClassImpl(byte[] cfbytes, ClassFileImpl context) {
         this.reader = new ClassReaderImpl(cfbytes, context);
-        ClassReaderImpl reader = (ClassReaderImpl) this.reader;
         int p = reader.interfacesPos;
         int icnt = reader.readU2(p);
         p += 2 + icnt * 2;
@@ -197,28 +204,21 @@ public final class ClassImpl
     }
 
     private boolean verifyModuleAttributes() {
-        if (findAttribute(Attributes.MODULE).isEmpty())
+        if (findAttribute(Attributes.module()).isEmpty())
             return false;
 
-        Set<AttributeMapper<?>> found = attributes().stream()
-                                                    .map(Attribute::attributeMapper)
-                                                    .collect(Collectors.toSet());
-
-        found.removeAll(allowedModuleAttributes);
-        found.retainAll(Attributes.PREDEFINED_ATTRIBUTES);
-        return found.isEmpty();
+        return attributes().stream().allMatch(a ->
+                a instanceof ModuleAttribute
+             || a instanceof ModulePackagesAttribute
+             || a instanceof ModuleHashesAttribute
+             || a instanceof ModuleMainClassAttribute
+             || a instanceof ModuleResolutionAttribute
+             || a instanceof ModuleTargetAttribute
+             || a instanceof InnerClassesAttribute
+             || a instanceof SourceFileAttribute
+             || a instanceof SourceDebugExtensionAttribute
+             || a instanceof RuntimeVisibleAnnotationsAttribute
+             || a instanceof RuntimeInvisibleAnnotationsAttribute
+             || a instanceof CustomAttribute);
     }
-
-    private static final Set<AttributeMapper<?>> allowedModuleAttributes
-            = Set.of(Attributes.MODULE,
-                     Attributes.MODULE_HASHES,
-                     Attributes.MODULE_MAIN_CLASS,
-                     Attributes.MODULE_PACKAGES,
-                     Attributes.MODULE_RESOLUTION,
-                     Attributes.MODULE_TARGET,
-                     Attributes.INNER_CLASSES,
-                     Attributes.SOURCE_FILE,
-                     Attributes.SOURCE_DEBUG_EXTENSION,
-                     Attributes.RUNTIME_VISIBLE_ANNOTATIONS,
-                     Attributes.RUNTIME_INVISIBLE_ANNOTATIONS);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,7 +28,6 @@ import java.lang.constant.ConstantDesc;
 import java.lang.constant.MethodTypeDesc;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import io.github.dmlloyd.classfile.Attribute;
 import io.github.dmlloyd.classfile.Attributes;
@@ -42,6 +41,7 @@ import io.github.dmlloyd.classfile.BootstrapMethodEntry;
 import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.attribute.BootstrapMethodsAttribute;
 import io.github.dmlloyd.classfile.constantpool.*;
+import java.util.Objects;
 
 import static io.github.dmlloyd.classfile.ClassFile.TAG_CLASS;
 import static io.github.dmlloyd.classfile.ClassFile.TAG_CONSTANTDYNAMIC;
@@ -119,6 +119,12 @@ public final class SplitConstantPool implements ConstantPoolBuilder {
     }
 
     @Override
+    public <T extends PoolEntry> T entryByIndex(int index, Class<T> cls) {
+        Objects.requireNonNull(cls);
+        return ClassReaderImpl.checkType(entryByIndex(index), index, cls);
+    }
+
+    @Override
     public BootstrapMethodEntryImpl bootstrapMethodEntry(int index) {
         if (index < 0 || index >= bootstrapMethodCount()) {
             throw new ConstantPoolException("Bad BSM index: " + index);
@@ -148,7 +154,7 @@ public final class SplitConstantPool implements ConstantPoolBuilder {
         }
         else {
             Attribute<BootstrapMethodsAttribute> a
-                    = new UnboundAttribute.AdHocAttribute<>(Attributes.BOOTSTRAP_METHODS) {
+                    = new UnboundAttribute.AdHocAttribute<>(Attributes.bootstrapMethods()) {
 
                 @Override
                 public void writeBody(BufWriter b) {

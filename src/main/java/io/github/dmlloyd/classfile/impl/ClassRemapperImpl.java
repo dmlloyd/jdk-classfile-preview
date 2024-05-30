@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -232,7 +232,7 @@ public record ClassRemapperImpl(Function<ClassDesc, ClassDesc> mapFunction) impl
                     ii.isInterface());
             else if (coe instanceof InvokeDynamicInstruction idi) 
                 cob.invokedynamic(DynamicCallSiteDesc.of(
-                    idi.bootstrapMethod(), idi.name().stringValue(),
+                    mapDirectMethodHandle(idi.bootstrapMethod()), idi.name().stringValue(),
                     mapMethodDesc(idi.typeSymbol()),
                     idi.bootstrapArgs().stream().map(this::mapConstantValue).toArray(ConstantDesc[]::new)));
             else if (coe instanceof NewObjectInstruction c) 

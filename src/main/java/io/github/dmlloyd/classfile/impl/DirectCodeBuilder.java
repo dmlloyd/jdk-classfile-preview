@@ -227,7 +227,7 @@ public final class DirectCodeBuilder
 
         if (context.debugElementsOption() == ClassFile.DebugElementsOption.PASS_DEBUG) {
             if (!characterRanges.isEmpty()) {
-                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.CHARACTER_RANGE_TABLE) {
+                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.characterRangeTable()) {
 
                     @Override
                     public void writeBody(BufWriter b) {
@@ -259,7 +259,7 @@ public final class DirectCodeBuilder
             }
 
             if (!localVariables.isEmpty()) {
-                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.LOCAL_VARIABLE_TABLE) {
+                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.localVariableTable()) {
                     @Override
                     public void writeBody(BufWriter b) {
                         int pos = b.size();
@@ -282,7 +282,7 @@ public final class DirectCodeBuilder
             }
 
             if (!localVariableTypes.isEmpty()) {
-                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.LOCAL_VARIABLE_TYPE_TABLE) {
+                Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.localVariableTypeTable()) {
                     @Override
                     public void writeBody(BufWriter b) {
                         int pos = b.size();
@@ -309,7 +309,7 @@ public final class DirectCodeBuilder
             attributes.withAttribute(lineNumberWriter);
         }
 
-        content = new UnboundAttribute.AdHocAttribute<>(Attributes.CODE) {
+        content = new UnboundAttribute.AdHocAttribute<>(Attributes.code()) {
 
             private void writeCounters(boolean codeMatch, BufWriterImpl buf) {
                 if (codeMatch) {
@@ -365,7 +365,7 @@ public final class DirectCodeBuilder
                 if (codeAndExceptionsMatch(codeLength)) {
                     switch (context.stackMapsOption()) {
                         case STACK_MAPS_WHEN_REQUIRED -> {
-                            attributes.withAttribute(original.findAttribute(Attributes.STACK_MAP_TABLE).orElse(null));
+                            attributes.withAttribute(original.findAttribute(Attributes.stackMapTable()).orElse(null));
                             writeCounters(true, buf);
                         }
                         case GENERATE_STACK_MAPS ->
@@ -398,7 +398,7 @@ public final class DirectCodeBuilder
         private int lastPc, lastLine, writtenLine;
 
         public DedupLineNumberTableAttribute(ConstantPoolBuilder constantPool, ClassFileImpl context) {
-            super(Attributes.LINE_NUMBER_TABLE);
+            super(Attributes.lineNumberTable());
             buf = new BufWriterImpl(constantPool, context);
             lastPc = -1;
             writtenLine = -1;
