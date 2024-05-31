@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import io.github.dmlloyd.classfile.Attribute;
 import io.github.dmlloyd.classfile.AttributedElement;
 import io.github.dmlloyd.classfile.Attributes;
+import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.ClassModel;
 import io.github.dmlloyd.classfile.ClassFileElement;
 import io.github.dmlloyd.classfile.CodeModel;
@@ -83,47 +84,43 @@ public record ParserVerifier(ClassModel classModel) {
                     errors.add(new VerifyError("%s at constant pool index %d in %s".formatted(e.getMessage(), cpe.index(), toString(classModel))));
                 }
             };
-            if (cpe instanceof DoubleEntry de) {
-                check.accept(de::doubleValue);
-            } else if (cpe instanceof FloatEntry fe) {
-                check.accept(fe::floatValue);
-            } else if (cpe instanceof IntegerEntry ie) {
-                check.accept(ie::intValue);
-            } else if (cpe instanceof LongEntry le) {
-                check.accept(le::longValue);
-            } else if (cpe instanceof Utf8Entry ue) {
-                check.accept(ue::stringValue);
-            } else if (cpe instanceof ConstantDynamicEntry cde) {
-                check.accept(cde::asSymbol);
-            } else if (cpe instanceof InvokeDynamicEntry ide) {
-                check.accept(ide::asSymbol);
-            } else if (cpe instanceof ClassEntry ce) {
-                check.accept(ce::asSymbol);
-            } else if (cpe instanceof StringEntry se) {
-                check.accept(se::stringValue);
-            } else if (cpe instanceof MethodHandleEntry mhe) {
-                check.accept(mhe::asSymbol);
-            } else if (cpe instanceof MethodTypeEntry mte) {
-                check.accept(mte::asSymbol);
-            } else if (cpe instanceof FieldRefEntry fre) {
-                check.accept(fre.owner()::asSymbol);
-                check.accept(fre::typeSymbol);
-                check.accept(() -> verifyFieldName(fre.name().stringValue()));
-            } else if (cpe instanceof InterfaceMethodRefEntry imre) {
-                check.accept(imre.owner()::asSymbol);
-                check.accept(imre::typeSymbol);
-                check.accept(() -> verifyMethodName(imre.name().stringValue()));
-            } else if (cpe instanceof MethodRefEntry mre) {
-                check.accept(mre.owner()::asSymbol);
-                check.accept(mre::typeSymbol);
-                check.accept(() -> verifyMethodName(mre.name().stringValue()));
-            } else if (cpe instanceof ModuleEntry me) {
-                check.accept(me::asSymbol);
-            } else if (cpe instanceof NameAndTypeEntry nate) {
-                check.accept(nate.name()::stringValue);
-                check.accept(() -> nate.type().stringValue());
-            } else if (cpe instanceof PackageEntry pe) {
-                check.accept(pe::asSymbol);
+            switch (cpe.tag()) {
+                case ClassFile.TAG_DOUBLE -> check.accept(((DoubleEntry) cpe)::doubleValue);
+                case ClassFile.TAG_FLOAT -> check.accept(((FloatEntry) cpe)::floatValue);
+                case ClassFile.TAG_INTEGER -> check.accept(((IntegerEntry) cpe)::intValue);
+                case ClassFile.TAG_LONG -> check.accept(((LongEntry) cpe)::longValue);
+                case ClassFile.TAG_UTF8 -> check.accept(((Utf8Entry) cpe)::stringValue);
+                case ClassFile.TAG_CONSTANTDYNAMIC -> check.accept(((ConstantDynamicEntry) cpe)::asSymbol);
+                case ClassFile.TAG_INVOKEDYNAMIC -> check.accept(((InvokeDynamicEntry) cpe)::asSymbol);
+                case ClassFile.TAG_CLASS -> check.accept(((ClassEntry) cpe)::asSymbol);
+                case ClassFile.TAG_STRING -> check.accept(((StringEntry) cpe)::stringValue);
+                case ClassFile.TAG_METHODHANDLE -> check.accept(((MethodHandleEntry) cpe)::asSymbol);
+                case ClassFile.TAG_METHODTYPE -> check.accept(((MethodTypeEntry) cpe)::asSymbol);
+                case ClassFile.TAG_FIELDREF -> {
+                    FieldRefEntry fre = (FieldRefEntry) cpe;
+                    check.accept(fre.owner()::asSymbol);
+                    check.accept(fre::typeSymbol);
+                    check.accept(() -> verifyFieldName(fre.name().stringValue()));
+                }
+                case ClassFile.TAG_INTERFACEMETHODREF -> {
+                    InterfaceMethodRefEntry imre = (InterfaceMethodRefEntry) cpe;
+                    check.accept(imre.owner()::asSymbol);
+                    check.accept(imre::typeSymbol);
+                    check.accept(() -> verifyMethodName(imre.name().stringValue()));
+                }
+                case ClassFile.TAG_METHODREF -> {
+                    MethodRefEntry mre = (MethodRefEntry) cpe;
+                    check.accept(mre.owner()::asSymbol);
+                    check.accept(mre::typeSymbol);
+                    check.accept(() -> verifyMethodName(mre.name().stringValue()));
+                }
+                case ClassFile.TAG_MODULE -> check.accept(((ModuleEntry) cpe)::asSymbol);
+                case ClassFile.TAG_NAMEANDTYPE -> {
+                    NameAndTypeEntry nate = (NameAndTypeEntry) cpe;
+                    check.accept(nate.name()::stringValue);
+                    check.accept(() -> nate.type().stringValue());
+                }
+                case ClassFile.TAG_PACKAGE -> check.accept(((PackageEntry) cpe)::asSymbol);
             }
         }
     }
