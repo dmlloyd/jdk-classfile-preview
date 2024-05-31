@@ -74,6 +74,7 @@ import io.github.dmlloyd.classfile.constantpool.StringEntry;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
 import io.github.dmlloyd.classfile.extras.reflect.AccessFlag;
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,7 +82,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -135,16 +135,22 @@ public final class ClassPrinterImpl {
         }
     }
 
-    public static final class ListNodeImpl extends AbstractList<Node> implements ListNode {
+    public static sealed class ListNodeImpl extends AbstractList<Node> implements ListNode {
 
         private final Style style;
         private final ConstantDesc name;
-        private final Node[] nodes;
+        protected final List<Node> nodes;
 
         public ListNodeImpl(Style style, ConstantDesc name, Stream<Node> nodes) {
             this.style = style;
             this.name = name;
-            this.nodes = nodes.toArray(Node[]::new);
+            this.nodes = nodes.toList();
+        }
+
+        protected ListNodeImpl(Style style, ConstantDesc name, List<Node> nodes) {
+            this.style = style;
+            this.name = name;
+            this.nodes = nodes;
         }
 
         @Override
@@ -163,17 +169,22 @@ public final class ClassPrinterImpl {
 
         @Override
         public Node get(int index) {
-            Objects.checkIndex(index, nodes.length);
-            return nodes[index];
+            return nodes.get(index);
         }
 
         @Override
         public int size() {
-            return nodes.length;
+            return nodes.size();
         }
     }
 
     public static final class MapNodeImpl implements MapNode {
+
+        private static final class PrivateListNodeImpl extends ListNodeImpl {
+            PrivateListNodeImpl(Style style, ConstantDesc name, Node... n) {
+                super(style, name, new ArrayList<>(List.of(n)));
+            }
+        }
 
         private final Style style;
         private final ConstantDesc name;
@@ -258,9 +269,19 @@ public final class ClassPrinterImpl {
 
 
         MapNodeImpl with(Node... nodes) {
-            for (var n : nodes)
-                if (n != null && map.put(n.name(), n) != null)
-                    throw new AssertionError("Double entry of " + n.name() + " into " + name);
+            for (var n : nodes) {
+                if (n != null) {
+                    var prev = map.putIfAbsent(n.name(), n);
+                    if (prev != null) {
+                        //nodes with duplicite keys are joined into a list
+                        if (prev instanceof PrivateListNodeImpl list) {
+                            list.nodes.add(n);
+                        } else {
+                            map.put(n.name(), new PrivateListNodeImpl(style, n.name(), prev, n));
+                        }
+                    }
+                }
+            }
             return this;
         }
     }
@@ -1010,7 +1031,7 @@ public final class ClassPrinterImpl {
                     nodes.add(leaf("module main class", mmca.mainClass().name().stringValue()));
                 else if (attr instanceof RecordAttribute ra)
                     nodes.add(new ListNodeImpl(BLOCK, "record components", ra.components().stream()
-                            .map(rc -> new MapNodeImpl(BLOCK, "record")
+                            .map(rc -> new MapNodeImpl(BLOCK, "component")
                                     .with(leafs(
                                         "name", rc.name().stringValue(),
                                         "type", rc.descriptor().stringValue()))

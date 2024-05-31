@@ -25,6 +25,7 @@
  */
 package io.github.dmlloyd.classfile.impl.verifier;
 
+import java.lang.constant.ClassDesc;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import io.github.dmlloyd.classfile.constantpool.DynamicConstantPoolEntry;
 import io.github.dmlloyd.classfile.constantpool.MemberRefEntry;
 import io.github.dmlloyd.classfile.constantpool.NameAndTypeEntry;
 import io.github.dmlloyd.classfile.extras.reflect.AccessFlag;
+import java.util.stream.Collectors;
 import io.github.dmlloyd.classfile.ClassModel;
 import io.github.dmlloyd.classfile.constantpool.ConstantPool;
 import io.github.dmlloyd.classfile.MethodModel;
@@ -127,6 +129,10 @@ public final class VerificationWrapper {
 
         String descriptor() {
             return m.methodType().stringValue();
+        }
+
+        String parameters() {
+            return m.methodTypeSymbol().parameterList().stream().map(ClassDesc::displayName).collect(Collectors.joining(","));
         }
 
         int codeLength() {
