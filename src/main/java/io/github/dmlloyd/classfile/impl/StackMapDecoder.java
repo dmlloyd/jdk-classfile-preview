@@ -25,21 +25,21 @@
 
 package io.github.dmlloyd.classfile.impl;
 
+import io.github.dmlloyd.classfile.BufWriter;
+import io.github.dmlloyd.classfile.ClassReader;
+import io.github.dmlloyd.classfile.Label;
+import io.github.dmlloyd.classfile.MethodModel;
+import io.github.dmlloyd.classfile.attribute.StackMapFrameInfo;
+import io.github.dmlloyd.classfile.attribute.StackMapFrameInfo.*;
+import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import java.lang.constant.ConstantDescs;
 import java.lang.constant.MethodTypeDesc;
 import io.github.dmlloyd.classfile.extras.reflect.AccessFlag;
 import java.util.List;
+import java.util.Objects;
 import java.util.TreeMap;
-import io.github.dmlloyd.classfile.BufWriter;
-
-import io.github.dmlloyd.classfile.constantpool.ClassEntry;
-import io.github.dmlloyd.classfile.attribute.StackMapFrameInfo;
-import io.github.dmlloyd.classfile.attribute.StackMapFrameInfo.*;
-import io.github.dmlloyd.classfile.ClassReader;
 
 import static io.github.dmlloyd.classfile.ClassFile.*;
-import io.github.dmlloyd.classfile.Label;
-import io.github.dmlloyd.classfile.MethodModel;
 
 public class StackMapDecoder {
 
@@ -239,6 +239,20 @@ public class StackMapDecoder {
 
         @Override
         public int tag() { return VT_OBJECT; }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o instanceof ObjectVerificationTypeInfoImpl that) {
+                return Objects.equals(className, that.className);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(className);
+        }
 
         @Override
         public String toString() {
