@@ -26,14 +26,12 @@
 package io.github.dmlloyd.classfile.impl;
 
 import io.github.dmlloyd.classfile.constantpool.InvokeDynamicEntry;
-import io.github.dmlloyd.classfile.constantpool.NameAndTypeEntry;
 import java.lang.constant.ClassDesc;
 import static java.lang.constant.ConstantDescs.*;
 import java.lang.constant.MethodTypeDesc;
 import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.constantpool.ConstantDynamicEntry;
-import io.github.dmlloyd.classfile.constantpool.DynamicConstantPoolEntry;
 import io.github.dmlloyd.classfile.constantpool.MemberRefEntry;
 import io.github.dmlloyd.classfile.constantpool.ConstantPoolBuilder;
 import java.nio.ByteBuffer;
@@ -46,6 +44,8 @@ import java.util.stream.Collectors;
 import io.github.dmlloyd.classfile.Attribute;
 
 import static io.github.dmlloyd.classfile.ClassFile.*;
+import static jdk.internal.constant.ConstantUtils.binaryNameToDesc;
+
 import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.attribute.StackMapTableAttribute;
@@ -1321,8 +1321,8 @@ public final class StackMapGenerator {
             }
         }
 
-        private static final ClassDesc CD_Cloneable = ClassDesc.of("java.lang.Cloneable");
-        private static final ClassDesc CD_Serializable = ClassDesc.of("java.io.Serializable");
+        private static final ClassDesc CD_Cloneable = binaryNameToDesc("java.lang.Cloneable");
+        private static final ClassDesc CD_Serializable = binaryNameToDesc("java.io.Serializable");
 
         private Type mergeReferenceFrom(Type from, ClassHierarchyImpl context) {
             if (from == NULL_TYPE) {
