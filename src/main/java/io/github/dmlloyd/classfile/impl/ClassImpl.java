@@ -137,7 +137,7 @@ public final class ClassImpl
             pos += 2;
             var arr = new ClassEntry[cnt];
             for (int i = 0; i < cnt; ++i) {
-                arr[i] = reader.readClassEntry(pos);
+                arr[i] = reader.readEntry(pos, ClassEntry.class);
                 pos += 2;
             }
             this.interfaces = List.of(arr);

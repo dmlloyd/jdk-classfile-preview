@@ -32,7 +32,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import io.github.dmlloyd.classfile.attribute.ModuleAttribute;
-import io.github.dmlloyd.classfile.attribute.UnknownAttribute;
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.constantpool.ConstantPoolBuilder;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
@@ -434,8 +433,8 @@ public sealed interface ClassFile
      * @implNote
      * This method behaves as if:
      * {@snippet lang = java:
-     *     import io.github.dmlloyd.classfile.constantpool.ConstantPoolBuilder;this.build(model.thisClass(), ConstantPoolBuilder.of(model),
-     *                     b -> b.transform(model, transform));
+     *     this.build(model.thisClass(), ConstantPoolBuilder.of(model),
+     *                     clb -> clb.transform(model, transform));
      *}
      *
      * @param model the class model to transform
@@ -443,7 +442,7 @@ public sealed interface ClassFile
      * @return the bytes of the new class
      */
     default byte[] transform(ClassModel model, ClassTransform transform) {
-        return transform(model, model.thisClass(), transform);
+        return transformClass(model, model.thisClass(), transform);
     }
 
     /**
@@ -458,8 +457,8 @@ public sealed interface ClassFile
      * @param transform the transform
      * @return the bytes of the new class
      */
-    default byte[] transform(ClassModel model, ClassDesc newClassName, ClassTransform transform) {
-        return transform(model, TemporaryConstantPool.INSTANCE.classEntry(newClassName), transform);
+    default byte[] transformClass(ClassModel model, ClassDesc newClassName, ClassTransform transform) {
+        return transformClass(model, TemporaryConstantPool.INSTANCE.classEntry(newClassName), transform);
     }
 
     /**
@@ -473,7 +472,7 @@ public sealed interface ClassFile
      * This method behaves as if:
      * {@snippet lang=java :
      *     this.build(newClassName, ConstantPoolBuilder.of(model),
-     *                     b -> b.transform(model, transform));
+     *                     clb -> clb.transform(model, transform));
      * }
      *
      * @param model the class model to transform
@@ -481,7 +480,7 @@ public sealed interface ClassFile
      * @param transform the transform
      * @return the bytes of the new class
      */
-    byte[] transform(ClassModel model, ClassEntry newClassName, ClassTransform transform);
+    byte[] transformClass(ClassModel model, ClassEntry newClassName, ClassTransform transform);
 
     /**
      * Verify a classfile.  Any verification errors found will be returned.
