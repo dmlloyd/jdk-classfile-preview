@@ -86,7 +86,7 @@ import io.github.dmlloyd.classfile.instruction.TypeCheckInstruction;
 
 import static java.util.Objects.requireNonNull;
 import static io.github.dmlloyd.classfile.impl.BytecodeHelpers.handleDescToHandleInfo;
-import io.github.dmlloyd.classfile.impl.TransformingCodeBuilder;
+
 import io.github.dmlloyd.classfile.extras.PreviewFeature;
 
 /**
@@ -171,7 +171,7 @@ public sealed interface CodeBuilder
     default CodeBuilder transforming(CodeTransform transform, Consumer<CodeBuilder> handler) {
         var resolved = transform.resolve(this);
         resolved.startHandler().run();
-        handler.accept(new TransformingCodeBuilder(this, resolved.consumer()));
+        handler.accept(new ChainedCodeBuilder(this, resolved.consumer()));
         resolved.endHandler().run();
         return this;
     }
