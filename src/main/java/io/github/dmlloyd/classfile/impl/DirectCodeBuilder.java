@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -35,7 +35,6 @@ import java.util.function.Function;
 
 import io.github.dmlloyd.classfile.Attribute;
 import io.github.dmlloyd.classfile.Attributes;
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.CodeBuilder;
 import io.github.dmlloyd.classfile.CodeElement;
@@ -72,7 +71,7 @@ import static io.github.dmlloyd.classfile.Opcode.LDC_W;
 
 public final class DirectCodeBuilder
         extends AbstractDirectBuilder<CodeModel>
-        implements TerminalCodeBuilder, LabelContext {
+        implements TerminalCodeBuilder {
     private final List<CharacterRange> characterRanges = new ArrayList<>();
     final List<AbstractPseudoInstruction.ExceptionCatchImpl> handlers = new ArrayList<>();
     private final List<LocalVariable> localVariables = new ArrayList<>();
@@ -80,7 +79,7 @@ public final class DirectCodeBuilder
     private final boolean transformFwdJumps, transformBackJumps;
     private final Label startLabel, endLabel;
     final MethodInfo methodInfo;
-    final BufWriter bytecodesBufWriter;
+    final BufWriterImpl bytecodesBufWriter;
     private CodeAttribute mruParent;
     private int[] mruParentTable;
     private Map<CodeAttribute, int[]> parentMap;
@@ -97,7 +96,7 @@ public final class DirectCodeBuilder
        allocLocal(TypeKind) bumps by nSlots
      */
 
-    public static Attribute<CodeAttribute> build(MethodInfo methodInfo,
+    public static UnboundAttribute<CodeAttribute> build(MethodInfo methodInfo,
                                                  Consumer<? super CodeBuilder> handler,
                                                  SplitConstantPool constantPool,
                                                  ClassFileImpl context,
@@ -141,7 +140,7 @@ public final class DirectCodeBuilder
         if (element instanceof AbstractElement ae) {
             ae.writeTo(this);
         } else {
-            writeAttribute((CustomAttribute)element);
+            writeAttribute((CustomAttribute<?>) element);
         }
         return this;
     }
@@ -190,9 +189,9 @@ public final class DirectCodeBuilder
         return methodInfo;
     }
 
-    private Attribute<CodeAttribute> content = null;
+    private UnboundAttribute<CodeAttribute> content = null;
 
-    private void writeExceptionHandlers(BufWriter buf) {
+    private void writeExceptionHandlers(BufWriterImpl buf) {
         int pos = buf.size();
         int handlersSize = handlers.size();
         buf.writeU2(handlersSize);
@@ -230,7 +229,7 @@ public final class DirectCodeBuilder
                 Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.characterRangeTable()) {
 
                     @Override
-                    public void writeBody(BufWriter b) {
+                    public void writeBody(BufWriterImpl b) {
                         int pos = b.size();
                         int crSize = characterRanges.size();
                         b.writeU2(crSize);
@@ -261,12 +260,12 @@ public final class DirectCodeBuilder
             if (!localVariables.isEmpty()) {
                 Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.localVariableTable()) {
                     @Override
-                    public void writeBody(BufWriter b) {
+                    public void writeBody(BufWriterImpl b) {
                         int pos = b.size();
                         int lvSize = localVariables.size();
                         b.writeU2(lvSize);
                         for (LocalVariable l : localVariables) {
-                            if (!l.writeTo(b)) {
+                            if (!Util.writeLocalVariable(b, l)) {
                                 if (context.deadLabelsOption() == ClassFile.DeadLabelsOption.DROP_DEAD_LABELS) {
                                     lvSize--;
                                 } else {
@@ -284,12 +283,12 @@ public final class DirectCodeBuilder
             if (!localVariableTypes.isEmpty()) {
                 Attribute<?> a = new UnboundAttribute.AdHocAttribute<>(Attributes.localVariableTypeTable()) {
                     @Override
-                    public void writeBody(BufWriter b) {
+                    public void writeBody(BufWriterImpl b) {
                         int pos = b.size();
                         int lvtSize = localVariableTypes.size();
                         b.writeU2(localVariableTypes.size());
                         for (LocalVariableType l : localVariableTypes) {
-                            if (!l.writeTo(b)) {
+                            if (!Util.writeLocalVariable(b, l)) {
                                 if (context.deadLabelsOption() == ClassFile.DeadLabelsOption.DROP_DEAD_LABELS) {
                                     lvtSize--;
                                 } else {
@@ -349,8 +348,7 @@ public final class DirectCodeBuilder
             }
 
             @Override
-            public void writeBody(BufWriter b) {
-                BufWriterImpl buf = (BufWriterImpl) b;
+            public void writeBody(BufWriterImpl buf) {
                 buf.setLabelContext(DirectCodeBuilder.this);
 
                 int codeLength = curPc();
@@ -386,8 +384,8 @@ public final class DirectCodeBuilder
 
                 buf.writeInt(codeLength);
                 buf.writeBytes(bytecodesBufWriter);
-                writeExceptionHandlers(b);
-                attributes.writeTo(b);
+                writeExceptionHandlers(buf);
+                attributes.writeTo(buf);
                 buf.setLabelContext(null);
             }
         };
@@ -424,12 +422,12 @@ public final class DirectCodeBuilder
         }
 
         @Override
-        public void writeBody(BufWriter b) {
+        public void writeBody(BufWriterImpl b) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public void writeTo(BufWriter b) {
+        public void writeTo(BufWriterImpl b) {
             b.writeIndex(b.constantPool().utf8Entry(Attributes.NAME_LINE_NUMBER_TABLE));
             push();
             b.writeInt(buf.size() + 2);
@@ -444,7 +442,7 @@ public final class DirectCodeBuilder
             codeAttributesMatch = cai.codeLength == curPc()
                                   && cai.compareCodeBytes(bytecodesBufWriter, 0, codeLength);
             if (codeAttributesMatch) {
-                BufWriter bw = new BufWriterImpl(constantPool, context);
+                var bw = new BufWriterImpl(constantPool, context);
                 writeExceptionHandlers(bw);
                 codeAttributesMatch = cai.classReader.compare(bw, 0, cai.exceptionHandlerPos, bw.size());
             }

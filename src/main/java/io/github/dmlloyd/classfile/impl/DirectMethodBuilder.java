@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -28,7 +28,6 @@ package io.github.dmlloyd.classfile.impl;
 import java.lang.constant.MethodTypeDesc;
 import java.util.function.Consumer;
 
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.CodeBuilder;
 import io.github.dmlloyd.classfile.CodeModel;
@@ -37,12 +36,11 @@ import io.github.dmlloyd.classfile.CustomAttribute;
 import io.github.dmlloyd.classfile.MethodBuilder;
 import io.github.dmlloyd.classfile.MethodElement;
 import io.github.dmlloyd.classfile.MethodModel;
-import io.github.dmlloyd.classfile.WritableElement;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
 
 public final class DirectMethodBuilder
         extends AbstractDirectBuilder<MethodModel>
-        implements TerminalMethodBuilder, WritableElement<MethodModel>, MethodInfo {
+        implements TerminalMethodBuilder, Util.Writable {
 
     final Utf8Entry name;
     final Utf8Entry desc;
@@ -115,7 +113,7 @@ public final class DirectMethodBuilder
         if (element instanceof AbstractElement ae) {
             ae.writeTo(this);
         } else {
-            writeAttribute((CustomAttribute)element);
+            writeAttribute((CustomAttribute<?>) element);
         }
         return this;
     }
@@ -148,8 +146,7 @@ public final class DirectMethodBuilder
     }
 
     @Override
-    public void writeTo(BufWriter b) {
-        BufWriterImpl buf = (BufWriterImpl) b;
+    public void writeTo(BufWriterImpl buf) {
         buf.writeU2(flags);
         buf.writeIndex(name);
         buf.writeIndex(desc);

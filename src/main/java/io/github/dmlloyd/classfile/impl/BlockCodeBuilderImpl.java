@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -51,13 +51,13 @@ public final class BlockCodeBuilderImpl
 
     public void start() {
         topLocal = topLocal(parent);
-        terminalMaxLocals = topLocal(terminal);
-        terminal.with((LabelTarget) startLabel);
+        terminalMaxLocals = terminal.curTopLocal();
+        parent.with((LabelTarget) startLabel);
     }
 
     public void end() {
-        terminal.with((LabelTarget) endLabel);
-        if (terminalMaxLocals != topLocal(terminal)) {
+        parent.with((LabelTarget) endLabel);
+        if (terminalMaxLocals != terminal.curTopLocal()) {
             throw new IllegalStateException("Interference in local variable slot management");
         }
     }
@@ -72,10 +72,8 @@ public final class BlockCodeBuilderImpl
 
     private int topLocal(CodeBuilder parent) {
         if (parent instanceof BlockCodeBuilderImpl b) return b.topLocal;
-        else if (parent instanceof ChainedCodeBuilder b) return topLocal(b.terminal);
-        else if (parent instanceof DirectCodeBuilder b) return b.curTopLocal();
-        else if (parent instanceof BufferedCodeBuilder b) return b.curTopLocal();
-        else if (parent instanceof TransformingCodeBuilder b) return topLocal(b.delegate);
+        else if (parent instanceof ChainedCodeBuilder b) return b.terminal.curTopLocal();
+        else if (parent instanceof TerminalCodeBuilder b) return b.curTopLocal();
         else throw new IllegalStateException();
     }
 

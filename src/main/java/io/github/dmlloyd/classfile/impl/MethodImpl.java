@@ -35,7 +35,7 @@ import java.util.function.Consumer;
 
 public final class MethodImpl
         extends AbstractElement
-    implements MethodModel, MethodInfo {
+        implements MethodModel, MethodInfo, Util.Writable {
 
     private final ClassReader reader;
     private final int startPos, endPos, attributesPos;
@@ -102,8 +102,7 @@ public final class MethodImpl
     }
 
     @Override
-    public void writeTo(BufWriter b) {
-        BufWriterImpl buf = (BufWriterImpl) b;
+    public void writeTo(BufWriterImpl buf) {
         if (buf.canWriteDirect(reader)) {
             reader.copyBytesTo(buf, startPos, endPos - startPos);
         }
@@ -111,7 +110,7 @@ public final class MethodImpl
             buf.writeU2(flags().flagsMask());
             buf.writeIndex(methodName());
             buf.writeIndex(methodType());
-            buf.writeList(attributes());
+            Util.writeAttributes(buf, attributes());
         }
     }
 
@@ -123,7 +122,7 @@ public final class MethodImpl
     }
 
     @Override
-    public void forEachElement(Consumer<MethodElement> consumer) {
+    public void forEach(Consumer<? super MethodElement> consumer) {
         consumer.accept(flags());
         for (Attribute<?> attr : attributes()) {
             if (attr instanceof MethodElement e)
@@ -141,7 +140,7 @@ public final class MethodImpl
                                new Consumer<>() {
                 @Override
                 public void accept(MethodBuilder mb) {
-                    MethodImpl.this.forEachElement(mb);
+                    MethodImpl.this.forEach(mb);
                 }
             });
         }

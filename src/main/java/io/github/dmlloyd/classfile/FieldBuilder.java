@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -30,7 +30,6 @@ import io.github.dmlloyd.classfile.impl.ChainedFieldBuilder;
 import io.github.dmlloyd.classfile.impl.TerminalFieldBuilder;
 import io.github.dmlloyd.classfile.extras.reflect.AccessFlag;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 import io.github.dmlloyd.classfile.extras.PreviewFeature;
 
@@ -68,9 +67,4 @@ public sealed interface FieldBuilder
         return with(AccessFlags.ofField(flags));
     }
 
-    /**
-     * {@return the {@link FieldModel} representing the field being transformed,
-     * if this field builder represents the transformation of some {@link FieldModel}}
-     */
-    Optional<FieldModel> original();
 }

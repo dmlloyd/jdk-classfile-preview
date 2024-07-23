@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,7 +24,6 @@
  */
 package io.github.dmlloyd.classfile.instruction;
 
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.CodeElement;
 import io.github.dmlloyd.classfile.CodeModel;
@@ -33,6 +32,7 @@ import io.github.dmlloyd.classfile.PseudoInstruction;
 import io.github.dmlloyd.classfile.Signature;
 import io.github.dmlloyd.classfile.attribute.LocalVariableTypeTableAttribute;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
+
 import io.github.dmlloyd.classfile.impl.AbstractPseudoInstruction;
 import io.github.dmlloyd.classfile.impl.BoundLocalVariableType;
 import io.github.dmlloyd.classfile.impl.TemporaryConstantPool;
@@ -80,14 +80,6 @@ public sealed interface LocalVariableType extends PseudoInstruction
      * {@return the end range of the local variable scope}
      */
     Label endScope();
-
-    /**
-     * Writes the local variable to the specified writer
-     *
-     * @param buf the writer
-     * @return true if the variable has been written
-     */
-    boolean writeTo(BufWriter buf);
 
     /**
      * {@return a local variable type pseudo-instruction}

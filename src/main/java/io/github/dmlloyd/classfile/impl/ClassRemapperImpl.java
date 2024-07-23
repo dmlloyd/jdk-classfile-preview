@@ -96,13 +96,11 @@ public record ClassRemapperImpl(Function<ClassDesc, ClassDesc> mapFunction) impl
     public void accept(ClassBuilder clb, ClassElement cle) {
         if (cle instanceof FieldModel fm) 
             clb.withField(fm.fieldName().stringValue(), map(
-                fm.fieldTypeSymbol()), fb ->
-                fm.forEachElement(asFieldTransform().resolve(fb).consumer()));
-        else if (cle instanceof MethodModel mm) 
+                fm.fieldTypeSymbol()), fb -> fb.transform(fm, asFieldTransform()));
+        else if (cle instanceof MethodModel mm)
             clb.withMethod(mm.methodName().stringValue(), mapMethodDesc(
-                mm.methodTypeSymbol()), mm.flags().flagsMask(), mb ->
-                mm.forEachElement(asMethodTransform().resolve(mb).consumer()));
-        else if (cle instanceof Superclass sc) 
+                mm.methodTypeSymbol()), mm.flags().flagsMask(), mb -> mb.transform(mm, asMethodTransform()));
+        else if (cle instanceof Superclass sc)
             clb.withSuperclass(map(sc.superclassEntry().asSymbol()));
         else if (cle instanceof Interfaces ins) 
             clb.withInterfaceSymbols(Util.mappedList(ins.interfaces(), in ->

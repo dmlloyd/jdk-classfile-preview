@@ -86,7 +86,8 @@ import io.github.dmlloyd.classfile.instruction.TypeCheckInstruction;
 
 import static java.util.Objects.requireNonNull;
 import static io.github.dmlloyd.classfile.impl.BytecodeHelpers.handleDescToHandleInfo;
-import io.github.dmlloyd.classfile.impl.TransformingCodeBuilder;
+
+import io.github.dmlloyd.classfile.impl.TransformImpl;
 import io.github.dmlloyd.classfile.extras.PreviewFeature;
 
 /**
@@ -126,12 +127,6 @@ import io.github.dmlloyd.classfile.extras.PreviewFeature;
 public sealed interface CodeBuilder
         extends ClassFileBuilder<CodeElement, CodeBuilder>
         permits CodeBuilder.BlockCodeBuilder, ChainedCodeBuilder, TerminalCodeBuilder, NonterminalCodeBuilder {
-
-    /**
-     * {@return the {@link CodeModel} representing the method body being transformed,
-     * if this code builder represents the transformation of some {@link CodeModel}}
-     */
-    Optional<CodeModel> original();
 
     /** {@return a fresh unbound label} */
     Label newLabel();
@@ -190,9 +185,9 @@ public sealed interface CodeBuilder
      * @return this builder
      */
     default CodeBuilder transforming(CodeTransform transform, Consumer<CodeBuilder> handler) {
-        var resolved = transform.resolve(this);
+        var resolved = TransformImpl.resolve(transform, this);
         resolved.startHandler().run();
-        handler.accept(new TransformingCodeBuilder(this, resolved.consumer()));
+        handler.accept(new ChainedCodeBuilder(this, resolved.consumer()));
         resolved.endHandler().run();
         return this;
     }

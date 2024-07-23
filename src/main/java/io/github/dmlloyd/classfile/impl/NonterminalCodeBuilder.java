@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,10 +24,7 @@
  */
 package io.github.dmlloyd.classfile.impl;
 
-import java.util.Optional;
-
 import io.github.dmlloyd.classfile.CodeBuilder;
-import io.github.dmlloyd.classfile.CodeModel;
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.constantpool.ConstantPoolBuilder;
 
@@ -54,11 +51,6 @@ public abstract sealed class NonterminalCodeBuilder implements CodeBuilder
     @Override
     public ConstantPoolBuilder constantPool() {
         return terminal.constantPool();
-    }
-
-    @Override
-    public Optional<CodeModel> original() {
-        return terminal.original();
     }
 
     @Override

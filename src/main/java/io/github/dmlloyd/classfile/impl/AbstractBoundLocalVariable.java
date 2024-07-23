@@ -24,12 +24,11 @@
  */
 package io.github.dmlloyd.classfile.impl;
 
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
 
 public class AbstractBoundLocalVariable
-        extends AbstractElement {
+        extends AbstractElement implements Util.WritableLocalVariable {
     protected final CodeImpl code;
     protected final int offset;
     private Utf8Entry nameEntry;
@@ -80,8 +79,9 @@ public class AbstractBoundLocalVariable
         return code.classReader.readU2(offset + 8);
     }
 
-    public boolean writeTo(BufWriter b) {
-        var lc = ((BufWriterImpl)b).labelContext();
+    @Override
+    public boolean writeLocalTo(BufWriterImpl b) {
+        var lc = b.labelContext();
         int startBci = lc.labelToBci(startScope());
         int endBci = lc.labelToBci(endScope());
         if (startBci == -1 || endBci == -1) {

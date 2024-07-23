@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -24,7 +24,6 @@
  */
 package io.github.dmlloyd.classfile.impl;
 
-import java.util.Optional;
 import java.util.function.Consumer;
 
 import io.github.dmlloyd.classfile.CodeBuilder;
@@ -32,17 +31,14 @@ import io.github.dmlloyd.classfile.CodeModel;
 import io.github.dmlloyd.classfile.CodeTransform;
 import io.github.dmlloyd.classfile.MethodBuilder;
 import io.github.dmlloyd.classfile.MethodElement;
-import io.github.dmlloyd.classfile.MethodModel;
 import io.github.dmlloyd.classfile.constantpool.ConstantPoolBuilder;
 
 public final class ChainedMethodBuilder implements MethodBuilder {
-    final MethodBuilder downstream;
     final TerminalMethodBuilder terminal;
     final Consumer<MethodElement> consumer;
 
     public ChainedMethodBuilder(MethodBuilder downstream,
                                 Consumer<MethodElement> consumer) {
-        this.downstream = downstream;
         this.consumer = consumer;
         this.terminal = downstream instanceof ChainedMethodBuilder cb ? cb.terminal : (TerminalMethodBuilder) downstream;
     }
@@ -55,26 +51,23 @@ public final class ChainedMethodBuilder implements MethodBuilder {
 
     @Override
     public MethodBuilder withCode(Consumer<? super CodeBuilder> handler) {
-        return downstream.with(terminal.bufferedCodeBuilder(null)
+        consumer.accept(terminal.bufferedCodeBuilder(null)
                                        .run(handler)
                                        .toModel());
+        return this;
     }
 
     @Override
     public MethodBuilder transformCode(CodeModel code, CodeTransform transform) {
         BufferedCodeBuilder builder = terminal.bufferedCodeBuilder(code);
         builder.transform(code, transform);
-        return downstream.with(builder.toModel());
+        consumer.accept(builder.toModel());
+        return this;
     }
 
     @Override
     public ConstantPoolBuilder constantPool() {
         return terminal.constantPool();
-    }
-
-    @Override
-    public Optional<MethodModel> original() {
-        return terminal.original();
     }
 
 }

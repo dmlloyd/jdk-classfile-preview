@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -35,7 +35,6 @@ import io.github.dmlloyd.classfile.Attribute;
 import io.github.dmlloyd.classfile.AttributeMapper;
 import io.github.dmlloyd.classfile.Attributes;
 import io.github.dmlloyd.classfile.BootstrapMethodEntry;
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.TypeAnnotation;
@@ -95,7 +94,7 @@ import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
 
 public abstract sealed class UnboundAttribute<T extends Attribute<T>>
         extends AbstractElement
-        implements Attribute<T> {
+        implements Attribute<T>, Util.Writable {
     protected final AttributeMapper<T> mapper;
 
     public UnboundAttribute(AttributeMapper<T> mapper) {
@@ -114,7 +113,7 @@ public abstract sealed class UnboundAttribute<T extends Attribute<T>>
 
     @Override
     @SuppressWarnings("unchecked")
-    public void writeTo(BufWriter buf) {
+    public void writeTo(BufWriterImpl buf) {
         mapper.writeAttribute(buf, (T) this);
     }
 
@@ -752,7 +751,7 @@ public abstract sealed class UnboundAttribute<T extends Attribute<T>>
     public record UnboundTypeAnnotation(TargetInfo targetInfo,
                                         List<TypePathComponent> targetPath,
                                         Utf8Entry className,
-                                        List<AnnotationElement> elements) implements TypeAnnotation {
+                                        List<AnnotationElement> elements) implements TypeAnnotation, Util.Writable {
 
         public UnboundTypeAnnotation(TargetInfo targetInfo, List<TypePathComponent> targetPath,
                                      Utf8Entry className, List<AnnotationElement> elements) {
@@ -769,8 +768,8 @@ public abstract sealed class UnboundAttribute<T extends Attribute<T>>
         }
 
         @Override
-        public void writeTo(BufWriter buf) {
-            LabelContext lr = ((BufWriterImpl) buf).labelContext();
+        public void writeTo(BufWriterImpl buf) {
+            LabelContext lr = buf.labelContext();
             // target_type
             buf.writeU1(targetInfo.targetType().targetTypeValue());
 
@@ -819,7 +818,7 @@ public abstract sealed class UnboundAttribute<T extends Attribute<T>>
             buf.writeU2(elements.size());
             for (AnnotationElement pair : elements()) {
                 buf.writeIndex(pair.name());
-                pair.value().writeTo(buf);
+                AnnotationReader.writeAnnotationValue(buf, pair.value());
             }
         }
     }
@@ -905,10 +904,10 @@ public abstract sealed class UnboundAttribute<T extends Attribute<T>>
             super(mapper);
         }
 
-        public abstract void writeBody(BufWriter b);
+        public abstract void writeBody(BufWriterImpl b);
 
         @Override
-        public void writeTo(BufWriter b) {
+        public void writeTo(BufWriterImpl b) {
             b.writeIndex(b.constantPool().utf8Entry(mapper.name()));
             b.writeInt(0);
             int start = b.size();

@@ -32,6 +32,7 @@ import io.github.dmlloyd.classfile.constantpool.LongEntry;
 import io.github.dmlloyd.classfile.Annotation;
 import io.github.dmlloyd.classfile.AnnotationElement;
 import io.github.dmlloyd.classfile.AnnotationValue;
+import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.ClassReader;
 import io.github.dmlloyd.classfile.TypeAnnotation;
 import static io.github.dmlloyd.classfile.ClassFile.*;
@@ -41,7 +42,7 @@ import java.util.List;
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.constantpool.Utf8Entry;
 
-class AnnotationReader {
+public final class AnnotationReader {
     private AnnotationReader() { }
 
     public static List<Annotation> readAnnotations(ClassReader classReader, int p) {
@@ -281,5 +282,25 @@ class AnnotationReader {
         p += 2;
         p = skipElementValuePairs(classReader, p);
         return p;
+    }
+
+    public static void writeAnnotation(BufWriterImpl buf, Annotation annotation) {
+        // handles annotations and type annotations
+        // TODO annotation cleanup later
+        ((Util.Writable) annotation).writeTo(buf);
+    }
+
+    public static void writeAnnotations(BufWriter buf, List<? extends Annotation> list) {
+        // handles annotations and type annotations
+        var internalBuf = (BufWriterImpl) buf;
+        internalBuf.writeU2(list.size());
+        for (var e : list) {
+            writeAnnotation(internalBuf, e);
+        }
+    }
+
+    public static void writeAnnotationValue(BufWriterImpl buf, AnnotationValue value) {
+        // TODO annotation cleanup later
+        ((Util.Writable) value).writeTo(buf);
     }
 }

@@ -33,13 +33,11 @@ import java.lang.constant.MethodTypeDesc;
 import java.util.List;
 
 import io.github.dmlloyd.classfile.BootstrapMethodEntry;
-import io.github.dmlloyd.classfile.BufWriter;
 import io.github.dmlloyd.classfile.ClassBuilder;
 import io.github.dmlloyd.classfile.ClassModel;
 import io.github.dmlloyd.classfile.impl.ClassReaderImpl;
 import io.github.dmlloyd.classfile.extras.constant.ModuleDesc;
 import io.github.dmlloyd.classfile.extras.constant.PackageDesc;
-import io.github.dmlloyd.classfile.WritableElement;
 import io.github.dmlloyd.classfile.impl.AbstractPoolEntry.ClassEntryImpl;
 import io.github.dmlloyd.classfile.impl.AbstractPoolEntry.NameAndTypeEntryImpl;
 import io.github.dmlloyd.classfile.impl.SplitConstantPool;
@@ -61,7 +59,7 @@ import static java.util.Objects.requireNonNull;
  */
 @PreviewFeature(feature = PreviewFeature.Feature.CLASSFILE_API)
 public sealed interface ConstantPoolBuilder
-        extends ConstantPool, WritableElement<ConstantPool>
+        extends ConstantPool
         permits SplitConstantPool, TemporaryConstantPool {
 
     /**

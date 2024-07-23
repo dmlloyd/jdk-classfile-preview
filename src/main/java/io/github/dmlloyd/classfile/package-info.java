@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -33,11 +33,11 @@
  * The main class for reading classfiles is {@link io.github.dmlloyd.classfile.ClassModel}; we
  * convert bytes into a {@link io.github.dmlloyd.classfile.ClassModel} with {@link
  * io.github.dmlloyd.classfile.ClassFile#parse(byte[])}:
- * <p>
+ *
  * {@snippet lang=java :
  * ClassModel cm = ClassFile.of().parse(bytes);
  * }
- * <p>
+ *
  * There are several additional overloads of {@code parse} that let you specify
  * various processing options.
  * <p>
@@ -380,8 +380,8 @@
  * {@snippet lang="java" class="PackageSnippets" region="instrumentCallsTransform"}
  * <p>
  * Then we can compose {@code fooToBar} and {@code instrumentCalls} with {@link
- * io.github.dmlloyd.classfile.CodeTransform#andThen(CodeTransform)}:
- * <p>
+ * io.github.dmlloyd.classfile.CodeTransform#andThen(io.github.dmlloyd.classfile.CodeTransform)}:
+ *
  * {@snippet lang=java :
  * var cc = ClassFile.of();
  * byte[] newBytes = cc.transform(cc.parse(bytes),
@@ -447,7 +447,7 @@
  * or more, zero or one, exactly one), and a list of components.  The elements
  * of a class are fields, methods, and the attributes that can appear on
  * classes:
- * <p>
+ *
  * {@snippet lang="text" :
  * ClassElement =
  *     FieldModel*(UtfEntry name, Utf8Entry descriptor)
@@ -472,7 +472,7 @@
  *     | PermittedSubclassesAttribute?(List<ClassEntry> permittedSubclasses)
  *     | DeclarationElement*
  * }
- *<p>
+ *
  * where {@code DeclarationElement} are the elements that are common to all declarations
  * (classes,  methods, fields) and so are factored out:
  *
