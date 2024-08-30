@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -83,16 +83,29 @@ public record ClassFileImpl(StackMapsOption stackMapsOption,
         var chro = classHierarchyResolverOption;
         var amo = attributeMapperOption;
         for (var o : options) {
-            if (o instanceof StackMapsOption oo) smo = oo;
-            else if (o instanceof DebugElementsOption oo) deo = oo;
-            else if (o instanceof LineNumbersOption oo) lno = oo;
-            else if (o instanceof AttributesProcessingOption oo) apo = oo;
-            else if (o instanceof ConstantPoolSharingOption oo) cpso = oo;
-            else if (o instanceof ShortJumpsOption oo) sjo = oo;
-            else if (o instanceof DeadCodeOption oo) dco = oo;
-            else if (o instanceof DeadLabelsOption oo) dlo = oo;
-            else if (o instanceof ClassHierarchyResolverOption oo) chro = oo;
-            else if (o instanceof AttributeMapperOption oo) amo = oo;
+            if (o instanceof StackMapsOption oo) {
+                smo = oo;
+            } else if (o instanceof DebugElementsOption oo) {
+                deo = oo;
+            } else if (o instanceof LineNumbersOption oo) {
+                lno = oo;
+            } else if (o instanceof AttributesProcessingOption oo) {
+                apo = oo;
+            } else if (o instanceof ConstantPoolSharingOption oo) {
+                cpso = oo;
+            } else if (o instanceof ShortJumpsOption oo) {
+                sjo = oo;
+            } else if (o instanceof DeadCodeOption oo) {
+                dco = oo;
+            } else if (o instanceof DeadLabelsOption oo) {
+                dlo = oo;
+            } else if (o instanceof ClassHierarchyResolverOption oo) {
+                chro = oo;
+            } else if (o instanceof AttributeMapperOption oo) {
+                amo = oo;
+            } else { // null or unknown Option type
+                throw new IllegalArgumentException("Invalid option: " + o);
+            }
         }
         return new ClassFileImpl(smo, deo, lno, apo, cpso, sjo, dco, dlo, chro, amo);
     }
