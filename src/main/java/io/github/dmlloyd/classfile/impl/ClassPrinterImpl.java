@@ -891,7 +891,7 @@ public final class ClassPrinterImpl {
                         "type", newo.className().name().stringValue()));
                     else if (coe instanceof NewPrimitiveArrayInstruction newa) in.with(leafs(
                         "dimensions", 1,
-                        "descriptor", newa.typeKind().typeName()));
+                        "descriptor", newa.typeKind().upperBound().displayName()));
                     else if (coe instanceof NewReferenceArrayInstruction newa) in.with(leafs(
                         "dimensions", 1,
                         "descriptor", newa.componentType().name().stringValue()));

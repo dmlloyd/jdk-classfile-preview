@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2023, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -146,7 +146,7 @@ public final class CodeStackTrackerImpl implements CodeStackTracker {
 
     private void push(TypeKind type) {
         if (stack != null) {
-            if (type != TypeKind.VoidType) stack.push(type);
+            if (type != TypeKind.VOID) stack.push(type);
         } else {
             maxSize = null;
         }
@@ -227,15 +227,15 @@ public final class CodeStackTrackerImpl implements CodeStackTracker {
         else if (el instanceof MonitorInstruction i) 
             pop(1);
         else if (el instanceof NewMultiArrayInstruction i) {
-            pop(i.dimensions());push(TypeKind.ReferenceType);
+            pop(i.dimensions());push(TypeKind.REFERENCE);
         }
         else if (el instanceof NewObjectInstruction i) 
-            push(TypeKind.ReferenceType);
+            push(TypeKind.REFERENCE);
         else if (el instanceof NewPrimitiveArrayInstruction i) {
-            pop(1);push(TypeKind.ReferenceType);
+            pop(1);push(TypeKind.REFERENCE);
         }
         else if (el instanceof NewReferenceArrayInstruction i) {
-            pop(1);push(TypeKind.ReferenceType);
+            pop(1);push(TypeKind.REFERENCE);
         }
         else if (el instanceof NopInstruction i) {}
         else if (el instanceof OperatorInstruction i) {
