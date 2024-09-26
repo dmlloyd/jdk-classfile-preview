@@ -118,9 +118,9 @@ import io.github.dmlloyd.classfile.MethodModel;
 import io.github.dmlloyd.classfile.TypeAnnotation;
 import io.github.dmlloyd.classfile.attribute.StackMapFrameInfo.*;
 
-import static io.github.dmlloyd.classfile.ClassFile.*;
 import io.github.dmlloyd.classfile.CompoundElement;
 import io.github.dmlloyd.classfile.FieldModel;
+import static io.github.dmlloyd.classfile.constantpool.PoolEntry.*;
 import static io.github.dmlloyd.classfile.impl.ClassPrinterImpl.Style.*;
 
 public final class ClassPrinterImpl {
@@ -582,21 +582,21 @@ public final class ClassPrinterImpl {
         return vtis.stream().mapMulti((vti, ret) -> {
             if (vti instanceof SimpleVerificationTypeInfo s) {
                 switch (s) {
-                    case ITEM_DOUBLE -> {
+                    case DOUBLE -> {
                         ret.accept("double");
                         ret.accept("double2");
                     }
-                    case ITEM_FLOAT ->
+                    case FLOAT ->
                         ret.accept("float");
-                    case ITEM_INTEGER ->
+                    case INTEGER ->
                         ret.accept("int");
-                    case ITEM_LONG ->  {
+                    case LONG ->  {
                         ret.accept("long");
                         ret.accept("long2");
                     }
-                    case ITEM_NULL -> ret.accept("null");
-                    case ITEM_TOP -> ret.accept("?");
-                    case ITEM_UNINITIALIZED_THIS -> ret.accept("THIS");
+                    case NULL -> ret.accept("null");
+                    case TOP -> ret.accept("?");
+                    case UNINITIALIZED_THIS -> ret.accept("THIS");
                 }
             } else if (vti instanceof ObjectVerificationTypeInfo o) {
                 ret.accept(o.className().name().stringValue());
@@ -647,12 +647,12 @@ public final class ClassPrinterImpl {
                             case TAG_STRING -> "String";
                             case TAG_FIELDREF -> "Fieldref";
                             case TAG_METHODREF -> "Methodref";
-                            case TAG_INTERFACEMETHODREF -> "InterfaceMethodref";
-                            case TAG_NAMEANDTYPE -> "NameAndType";
-                            case TAG_METHODHANDLE -> "MethodHandle";
-                            case TAG_METHODTYPE -> "MethodType";
-                            case TAG_CONSTANTDYNAMIC -> "Dynamic";
-                            case TAG_INVOKEDYNAMIC -> "InvokeDynamic";
+                            case TAG_INTERFACE_METHODREF -> "InterfaceMethodref";
+                            case TAG_NAME_AND_TYPE -> "NameAndType";
+                            case TAG_METHOD_HANDLE -> "MethodHandle";
+                            case TAG_METHOD_TYPE -> "MethodType";
+                            case TAG_DYNAMIC -> "Dynamic";
+                            case TAG_INVOKE_DYNAMIC -> "InvokeDynamic";
                             case TAG_MODULE -> "Module";
                             case TAG_PACKAGE -> "Package";
                             default -> throw new AssertionError("Unknown CP tag: " + e.tag());

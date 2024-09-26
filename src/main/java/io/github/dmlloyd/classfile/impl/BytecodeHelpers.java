@@ -46,7 +46,7 @@ import io.github.dmlloyd.classfile.constantpool.MemberRefEntry;
 import io.github.dmlloyd.classfile.constantpool.MethodHandleEntry;
 import io.github.dmlloyd.classfile.constantpool.NameAndTypeEntry;
 
-import static io.github.dmlloyd.classfile.ClassFile.*;
+import static io.github.dmlloyd.classfile.impl.RawBytecodeHelper.*;
 
 /**
  * Note: This class switches on opcode.bytecode for code size

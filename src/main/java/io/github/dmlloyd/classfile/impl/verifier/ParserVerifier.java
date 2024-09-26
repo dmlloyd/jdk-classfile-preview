@@ -85,42 +85,42 @@ public record ParserVerifier(ClassModel classModel) {
                 }
             };
             switch (cpe.tag()) {
-                case ClassFile.TAG_DOUBLE -> check.accept(((DoubleEntry) cpe)::doubleValue);
-                case ClassFile.TAG_FLOAT -> check.accept(((FloatEntry) cpe)::floatValue);
-                case ClassFile.TAG_INTEGER -> check.accept(((IntegerEntry) cpe)::intValue);
-                case ClassFile.TAG_LONG -> check.accept(((LongEntry) cpe)::longValue);
-                case ClassFile.TAG_UTF8 -> check.accept(((Utf8Entry) cpe)::stringValue);
-                case ClassFile.TAG_CONSTANTDYNAMIC -> check.accept(((ConstantDynamicEntry) cpe)::asSymbol);
-                case ClassFile.TAG_INVOKEDYNAMIC -> check.accept(((InvokeDynamicEntry) cpe)::asSymbol);
-                case ClassFile.TAG_CLASS -> check.accept(((ClassEntry) cpe)::asSymbol);
-                case ClassFile.TAG_STRING -> check.accept(((StringEntry) cpe)::stringValue);
-                case ClassFile.TAG_METHODHANDLE -> check.accept(((MethodHandleEntry) cpe)::asSymbol);
-                case ClassFile.TAG_METHODTYPE -> check.accept(((MethodTypeEntry) cpe)::asSymbol);
-                case ClassFile.TAG_FIELDREF -> {
+                case PoolEntry.TAG_DOUBLE -> check.accept(((DoubleEntry) cpe)::doubleValue);
+                case PoolEntry.TAG_FLOAT -> check.accept(((FloatEntry) cpe)::floatValue);
+                case PoolEntry.TAG_INTEGER -> check.accept(((IntegerEntry) cpe)::intValue);
+                case PoolEntry.TAG_LONG -> check.accept(((LongEntry) cpe)::longValue);
+                case PoolEntry.TAG_UTF8 -> check.accept(((Utf8Entry) cpe)::stringValue);
+                case PoolEntry.TAG_DYNAMIC -> check.accept(((ConstantDynamicEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_INVOKE_DYNAMIC -> check.accept(((InvokeDynamicEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_CLASS -> check.accept(((ClassEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_STRING -> check.accept(((StringEntry) cpe)::stringValue);
+                case PoolEntry.TAG_METHOD_HANDLE -> check.accept(((MethodHandleEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_METHOD_TYPE -> check.accept(((MethodTypeEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_FIELDREF -> {
                     FieldRefEntry fre = (FieldRefEntry) cpe;
                     check.accept(fre.owner()::asSymbol);
                     check.accept(fre::typeSymbol);
                     check.accept(() -> verifyFieldName(fre.name().stringValue()));
                 }
-                case ClassFile.TAG_INTERFACEMETHODREF -> {
+                case PoolEntry.TAG_INTERFACE_METHODREF -> {
                     InterfaceMethodRefEntry imre = (InterfaceMethodRefEntry) cpe;
                     check.accept(imre.owner()::asSymbol);
                     check.accept(imre::typeSymbol);
                     check.accept(() -> verifyMethodName(imre.name().stringValue()));
                 }
-                case ClassFile.TAG_METHODREF -> {
+                case PoolEntry.TAG_METHODREF -> {
                     MethodRefEntry mre = (MethodRefEntry) cpe;
                     check.accept(mre.owner()::asSymbol);
                     check.accept(mre::typeSymbol);
                     check.accept(() -> verifyMethodName(mre.name().stringValue()));
                 }
-                case ClassFile.TAG_MODULE -> check.accept(((ModuleEntry) cpe)::asSymbol);
-                case ClassFile.TAG_NAMEANDTYPE -> {
+                case PoolEntry.TAG_MODULE -> check.accept(((ModuleEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_NAME_AND_TYPE -> {
                     NameAndTypeEntry nate = (NameAndTypeEntry) cpe;
                     check.accept(nate.name()::stringValue);
                     check.accept(() -> nate.type().stringValue());
                 }
-                case ClassFile.TAG_PACKAGE -> check.accept(((PackageEntry) cpe)::asSymbol);
+                case PoolEntry.TAG_PACKAGE -> check.accept(((PackageEntry) cpe)::asSymbol);
             }
         }
     }

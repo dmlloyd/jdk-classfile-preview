@@ -39,7 +39,7 @@ import io.github.dmlloyd.classfile.attribute.StackMapTableAttribute;
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.instruction.*;
 
-import static io.github.dmlloyd.classfile.ClassFile.*;
+import static io.github.dmlloyd.classfile.impl.RawBytecodeHelper.*;
 
 public final class CodeImpl
         extends BoundAttribute.BoundCodeAttribute

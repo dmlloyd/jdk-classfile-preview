@@ -24,11 +24,11 @@
  */
 package io.github.dmlloyd.classfile.impl;
 
+import io.github.dmlloyd.classfile.constantpool.PoolEntry;
 import java.lang.constant.ConstantDesc;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import io.github.dmlloyd.classfile.ClassFile;
 import io.github.dmlloyd.classfile.Instruction;
 import io.github.dmlloyd.classfile.constantpool.ClassEntry;
 import io.github.dmlloyd.classfile.instruction.SwitchCase;
@@ -421,7 +421,7 @@ public abstract sealed class AbstractInstruction
 
         @Override
         public boolean isInterface() {
-            return method().tag() == ClassFile.TAG_INTERFACEMETHODREF;
+            return method().tag() == PoolEntry.TAG_INTERFACE_METHODREF;
         }
 
         @Override
