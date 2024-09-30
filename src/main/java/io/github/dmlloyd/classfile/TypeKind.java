@@ -246,17 +246,4 @@ public enum TypeKind {
                 ? fromDescriptor(descriptor.descriptorString())
                 : REFERENCE;
     }
-
-    // XXX: Added compatibility constants (DML)
-    // they won't work in switch but they might avoid problems elsewhere
-    @Deprecated public static final TypeKind BooleanType = BOOLEAN;
-    @Deprecated public static final TypeKind ByteType = BYTE;
-    @Deprecated public static final TypeKind CharType = CHAR;
-    @Deprecated public static final TypeKind ShortType = SHORT;
-    @Deprecated public static final TypeKind IntType = INT;
-    @Deprecated public static final TypeKind LongType = LONG;
-    @Deprecated public static final TypeKind FloatType = FLOAT;
-    @Deprecated public static final TypeKind DoubleType = DOUBLE;
-    @Deprecated public static final TypeKind ReferenceType = REFERENCE;
-    @Deprecated public static final TypeKind VoidType = VOID;
 }
