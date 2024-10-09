@@ -24,8 +24,6 @@
  */
 package io.github.dmlloyd.classfile.impl;
 
-import java.util.Objects;
-
 import io.github.dmlloyd.classfile.Label;
 import io.github.dmlloyd.classfile.instruction.LabelTarget;
 
@@ -52,7 +50,7 @@ public final class LabelImpl
     private int bci;
 
     public LabelImpl(LabelContext labelContext, int bci) {
-        this.labelContext = Objects.requireNonNull(labelContext);
+        this.labelContext = labelContext;
         this.bci = bci;
     }
 
